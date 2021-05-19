@@ -1,0 +1,39 @@
+DELIMITER //
+CREATE PROCEDURE Task11(
+ in Mbr INT,
+ in TrainP INT,
+ in CatP INT,
+ in TripC INT,
+ in TripP INT,
+ in RouteP VARCHAR(35),
+ in PlaceP VARCHAR(35)
+)
+BEGIN
+ select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname,
+ count(Trs.Name) from tourists Trs
+ where exists ( select 1 from Journeys J
+ where J.LeaderID = Trs.ID )
+ and (Trs.Type = CatP or CatP is null) 
+ and (exists(select 1 from Journeys J
+ where J.LeaderID = Trs.ID 
+ and J.ID=TripP) or TripP is null)
+ and (exists(select 1 from GroupsLeaders GL
+ where GL.TouristID = Trs.ID
+ and GL.TouristID = TrainP) or TrainP is null)
+ and (exists ( select 1 from GroupParticipant GP
+ where GP.TouristID = Trs.ID
+ and GP.TouristID = Mbr) or Mbr is null) 
+ and (exists(select 1 from Journeys J
+ where J.LeaderID = Trs.ID 
+ and J.Route = RouteP) or RouteP is null)
+ and (exists(select 1 from Journeys J
+ where J.LeaderID = Trs.ID
+ having count(J.ID) = TripC) or TripC is null)
+ and (exists(select 1 from Journeys J
+ inner join RoutePlan RP on RP.JourneyID = J.ID
+ where J.LeaderID = Trs.ID
+ and RP.Place = PlaceP) or PlaceP is null);
+END//

@@ -1,0 +1,18 @@
+DELIMITER //
+CREATE PROCEDURE Task9(
+IN RtL INT,
+IN Pl VARCHAR(35),
+IN Df VARCHAR(35)
+)
+BEGIN
+Select
+T.Route,
+count(T.Route)
+from journeys T
+where 1=1
+and (exists(select 1 from RoutePlan RS
+where RS.JourneyID=Tt.ID
+and RS.Place = Pl) or Pl is null)
+and (Tt.Difficult = Df or Df is null)
+and ((Tt.RouteLength > RtL) or RtL is null);
+END//

@@ -1,0 +1,25 @@
+DELIMITER //
+CREATE PROCEDURE Task7(
+ 
+IN SDat DATETIME,
+IN EDat DATETIME,
+IN Tr INT,
+IN Sct INT,
+IN Descr VARCHAR(35)
+)
+BEGIN
+ Select
+ GW.Details,
+ SUM(GW.TimeHrs) as SumTime
+ from GroupsWork GW
+ inner join GroupsLeaders GL on GL.ID=GW.LeaderID
+ inner join SectionGroups SG on SG.ID=GW.GroupID
+ where 1=1
+ and (GW.Details = Descr or Descr is null)
+ and (GW.Training_Date >= SDat or SDat is null)
+ and (GW.Training_Date <= EDat or EDat is null)
+ and (GW.LeaderID = Tr or Tr is null)
+ and (SG.SID = Sct or Sct is null) 
+ group by
+ GW.Details; 
+END//

@@ -1,0 +1,32 @@
+DELIMITER //
+CREATE PROCEDURE Task(
+IN Sct INT,
+IN LeadP INT,
+IN GrCnt INT,
+IN Sdate DATE,
+IN Edate DATE
+)
+BEGIN
+Select 
+J.Route,
+count(J.Route)
+from journeys J
+inner join tourists Trs on Trs.ID = J.LeaderID
+inner join groupparticipant GP on GP.TouristID = Trs.ID
+inner join sectiongroups SG on SG.ID = GP.GroupID
+where 1=1
+and (exists(select 1 from journeyparticipants JP
+inner join groupparticipant GM on GM.TouristID = JP.TouristID
+inner join sectiongroups SG on SG.ID=GM.GroupID
+where JP.JourneyID = J.ID
+and SG.SID = Sct)
+or Sct is null)
+and (J.StartDate >= Sdate or Sdate is null)
+and (J.StartDate <= Edate or Edate is null)
+and (J.LeaderID = LeadP or LeadP is null)
+and (exists( select 1 from journeyparticipants JP
+inner join groupparticipant GP on GP.TouristID = JP.TouristID
+where JP.JourneyID = J.ID
+having count(distinct GP.GroupID) = GrCnt)
+or GrCnt is null);
+END//

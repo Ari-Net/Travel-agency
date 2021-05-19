@@ -1,0 +1,40 @@
+DELIMITER //
+CREATE PROCEDURE Task5(
+ IN Sct INT,
+ IN Grp INT,
+ IN TripCnt INT,
+ IN TripP INT,
+ IN Sdt DATE,
+ IN Edt DATE,
+ IN Rt VARCHAR(35),
+ IN Tp INT
+)
+BEGIN
+ Select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname,
+ count(Trs.Name)
+ from tourists Trs
+ inner join groupparticipant GP on GP.TouristID = Trs.ID
+ inner join SectionGroups SG on SG.ID=GP.GroupID
+ where 1=1
+ and (SG.SID = Sct or Sct is null)
+ and (SG.ID= Grp or Grp is null)
+ and (exists( Select 1 from journeyparticipants JP
+ where JP.TouristID=Trs.ID
+ Having count(JP.JourneyID) = TripCnt) or TripCnt is null) 
+ and (exists (select 1 from journeyparticipants JP
+ where JP.TouristID=Trs.ID
+ and JP.JourneyID=TripP) or TripP is null)
+ and exists (select 1 from journeyparticipants JP
+ inner join journeys J on J.ID=JP.JourneyID
+ where JP.TouristID=Trs.ID
+ and (J.StartDate >= Sdt or Sdt is null)
+ and (J.StartDate <= Edt or Edt is null))
+ and (exists (select 1 from journeyparticipants JP
+ inner join journeys J on J.ID=JP.JourneyID
+ where JP.TouristID=Trs.ID
+ and J.Route=Rt) or Rt is null)
+and (Trs.Type=Tp or Tp is null);
+END//

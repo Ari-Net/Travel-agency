@@ -1,0 +1,18 @@
+DELIMITER //
+CREATE PROCEDURE Task4(
+ IN Gr int,
+ IN SDate Date,
+ IN ADate Date
+)
+BEGIN
+ Select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname
+ from tourists Trs
+ inner join groupsleaders GS on GS.TouristID=Trs.ID
+ where 1=1 
+ and (GS.CreateDate >= SDate or SDate is null) 
+ and (GS.CreateDate <= ADate or ADate is null)
+ and (GS.GroupID=Gr or Gr is null );
+END//

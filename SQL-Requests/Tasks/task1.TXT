@@ -1,0 +1,24 @@
+DELIMITER //
+CREATE PROCEDURE Task1
+(
+ IN Sct Int,
+ IN Gndr varchar(35),
+ IN Grp INT,
+ IN Age INT
+)
+BEGIN
+select
+ Trst.Name,
+ Trst.SecondName,
+ Trst.Surname
+from tourists Trst
+ inner join GroupParticipant GP on GP.TouristID=Trst.ID
+ inner join SectionGroups SG on SG.ID=GP.GroupID
+where 1=1
+ and (SG.SID = Sct or Sct is null) 
+ and (SG.ID= Grp or Grp is null)
+ and (Trst.Gender = Gndr or Gndr is null)
+ and (Year(curdate())-Year(Trst.Birthday)=Age or Age is null)
+;
+END//
+

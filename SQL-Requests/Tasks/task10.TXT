@@ -1,0 +1,24 @@
+DELIMITER //
+CREATE PROCEDURE Task10(
+ IN Sct INT,
+ IN Grp INT,
+ IN Skl INT
+)
+BEGIN
+ Select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname,
+ count(Trs.Name)
+ from tourists Trs
+ inner join GroupParticipant GP on GP.TouristID=Trs.ID
+ inner join SectionGroups SG on SG.ID=GP.GroupID
+ where 1=1
+ and (GP.GroupID = Grp or Grp is null) 
+ and (SG.SID = Sct or Sct is null)
+ and (exists(select 1 from touristskills TS
+ inner join Skills Sk on Sk.ID=TS.SkillID
+ inner join Requirements R on R.SkillID=Sk.ID
+ where TS.TouristID=Trs.ID
+ and R.SkillID = Skl) or Skl is null);
+END//

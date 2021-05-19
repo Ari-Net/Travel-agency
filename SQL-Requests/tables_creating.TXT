@@ -1,0 +1,182 @@
+CREATE TABLE `Tourists` (
+ `Name` VARCHAR(35) NOT NULL,
+ `SecondName` VARCHAR(35) NOT NULL,
+ `Surname` VARCHAR(35) NOT NULL,
+ `ID` INTEGER NOT NULL,
+ `Birthday` DATE NOT NULL,
+ `Type` INTEGER,
+ `Gender` VARCHAR(35) NOT NULL,
+ CONSTRAINT `Tourists_KEY` PRIMARY KEY (`ID`)
+);
+
+CREATE TABLE `Sections` (
+ `ID` INTEGER NOT NULL,
+ `Name` VARCHAR(35) NOT NULL,
+ CONSTRAINT `Section_KEY` PRIMARY KEY (`ID`)
+);
+
+CREATE TABLE `SectionGroups` (
+ `ID` INTEGER NOT NULL,
+ `Name` VARCHAR(35) NOT NULL,
+ `SID` INTEGER,
+ CONSTRAINT `SectionGroups_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `SectionGroups` ADD CONSTRAINT `SectionGroups_F_KEY` 
+ FOREIGN KEY (`SID`) REFERENCES `Sections` (`ID`);
+
+CREATE TABLE `GroupsLeaders` (
+ `ID` INTEGER NOT NULL,
+ `TouristID` INTEGER NOT NULL,
+ `GroupID` INTEGER NOT NULL,
+ `Salary` DECIMAL NOT NULL,
+ `CreateDate` DATE NOT NULL,
+ CONSTRAINT `GroupsLeaders_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `GroupsLeaders` ADD CONSTRAINT `Tourists_GroupsLeaders` 
+ FOREIGN KEY (`TouristID`) REFERENCES `Tourists` (`ID`);
+ALTER TABLE `GroupsLeaders` ADD CONSTRAINT `SectionGroups_GroupsLeaders` 
+ FOREIGN KEY (`GroupID`) REFERENCES `SectionGroups` (`ID`);
+
+CREATE TABLE `GroupsWork` (
+ `ID` INTEGER NOT NULL,
+ `GroupID` INTEGER NOT NULL,
+ `LeaderID` INTEGER NOT NULL,
+ `Training_Date` DATETIME NOT NULL,
+ `Details` VARCHAR(35) NOT NULL,
+ `TimeHrs` INTEGER NOT NULL,
+ CONSTRAINT `GroupsWork_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `GroupsWork` ADD CONSTRAINT `GroupsLeaders_GroupsWork` 
+ FOREIGN KEY (`LeaderID`) REFERENCES `GroupsLeaders` (`ID`);
+ALTER TABLE `GroupsWork` ADD CONSTRAINT `SectionGroups_GroupsWork` 
+ FOREIGN KEY (`GroupID`) REFERENCES `SectionGroups` (`ID`);
+
+CREATE TABLE `GroupParticipant` (
+ `ID` INTEGER NOT NULL,
+ `TouristID` INTEGER NOT NULL,
+ `GroupID` INTEGER NOT NULL,
+ CONSTRAINT `GroupParticipant_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `GroupParticipant` ADD CONSTRAINT `Person_GroupParticipant` 
+ FOREIGN KEY (`TouristID`) REFERENCES `Tourists` (`ID`);
+ALTER TABLE `GroupParticipant` ADD CONSTRAINT `Group_GroupParticipant` 
+ FOREIGN KEY (`GroupID`) REFERENCES `SectionGroups` (`ID`);
+
+CREATE TABLE `GroupsList` (
+ `ID` INTEGER NOT NULL,
+ `GroupWorkID` INTEGER NOT NULL,
+ `ParticipantID` INTEGER NOT NULL,
+ CONSTRAINT `GroupsList_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `GroupsList` ADD CONSTRAINT `GroupSchedule_GroupsList` 
+ FOREIGN KEY (`GroupWorkID`) REFERENCES `GroupsWork` (`ID`);
+ALTER TABLE `GroupsList` ADD CONSTRAINT `GroupParticipant_GroupsList` 
+ FOREIGN KEY (`ParticipantID`) REFERENCES `GroupParticipant` (`ID`);
+
+CREATE TABLE `SectionBoss` (
+ `ID` INTEGER NOT NULL,
+ `SectionID` INTEGER NOT NULL,
+ `TouristID` INTEGER NOT NULL,
+ `Salary` DECIMAL NOT NULL,
+ `StartDate` DATE NOT NULL,
+ `EndDate` DATE,
+ CONSTRAINT `SectionBoss_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `SectionBoss` ADD CONSTRAINT `Tourists_SectionBoss` 
+ FOREIGN KEY (`TouristID`) REFERENCES `Tourists` (`ID`);
+ALTER TABLE `SectionBoss` ADD CONSTRAINT `Sections_SectionBoss` 
+ FOREIGN KEY (`SectionID`) REFERENCES `Sections` (`ID`);
+
+CREATE TABLE `Skills` (
+ `ID` INTEGER NOT NULL,
+ `Name` VARCHAR(35),
+ CONSTRAINT `Skills_KEY` PRIMARY KEY (`ID`)
+);
+
+CREATE TABLE `TouristSkills` (
+ `ID` INTEGER NOT NULL,
+ `SkillID` INTEGER NOT NULL,
+ `TouristID` INTEGER NOT NULL,
+ CONSTRAINT `TouristSkills_KEY` PRIMARY KEY (`ID`),
+ CONSTRAINT `TouristSkills_U` UNIQUE (`SkillID`)
+);
+ALTER TABLE `TouristSkills` ADD CONSTRAINT `Tourists_TouristSkills` 
+ FOREIGN KEY (`TouristID`) REFERENCES `Tourists` (`ID`);
+ALTER TABLE `TouristSkills` ADD CONSTRAINT `Skills_TouristSkills` 
+ FOREIGN KEY (`SkillID`) REFERENCES `Skills` (`ID`);
+
+CREATE TABLE `Journeys` (
+ `ID` INTEGER NOT NULL, 
+`Route` VARCHAR(35) NOT NULL,
+`Difficult` VARCHAR(35),
+ `ParticipiantsCnt` INTEGER NOT NULL,
+ `StartDate` DATE NOT NULL,
+ `DaysCnt` INTEGER NOT NULL,
+ `RouteLength` DECIMAL,
+ `LeaderID` INTEGER NOT NULL,
+ CONSTRAINT `Journeys_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `Journeys` ADD CONSTRAINT `Tourists_Journeys` 
+ FOREIGN KEY (`LeaderID`) REFERENCES `Tourists` (`ID`);
+
+CREATE TABLE `JourneyParticipants` (
+ `ID` INTEGER NOT NULL,
+ `JourneyID` INTEGER NOT NULL,
+ `TouristID` INTEGER NOT NULL,
+ CONSTRAINT `JourneyParticipants_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `JourneyParticipants` ADD CONSTRAINT `Tourists_JourneyParticipant` 
+ FOREIGN KEY (`TouristID`) REFERENCES `Tourists` (`ID`); 
+ALTER TABLE `JourneyParticipants` ADD CONSTRAINT `Journeys_JourneyParticipant` 
+ FOREIGN KEY (`JourneyID`) REFERENCES `Journeys` (`ID`); 
+
+CREATE TABLE `Competitions` (
+ `ID` INTEGER NOT NULL,
+ `NameC` VARCHAR(35) NOT NULL,
+ `DateC` DATE NOT NULL,
+ `Details` VARCHAR(35) NOT NULL,
+ CONSTRAINT `Competition_KEY` PRIMARY KEY (`ID`)
+); 
+
+CREATE TABLE `CompetitionParticipants` (
+ `ID` INT NOT NULL,
+ `CompetitionID` INTEGER NOT NULL,
+ `ParticipantID` INTEGER NOT NULL,
+ CONSTRAINT `CompetitionParticipants_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `CompetitionParticipants` ADD CONSTRAINT `Competition_CompetitionParticipants` 
+ FOREIGN KEY (`CompetitionID`) REFERENCES `Competitions` (`ID`);
+ALTER TABLE `CompetitionParticipants` ADD CONSTRAINT `GroupParticipant_CompetitionParticipantsr` 
+ FOREIGN KEY (`ParticipantID`) REFERENCES `GroupParticipant` (`ID`);
+
+CREATE TABLE `RouteDiary` (
+ `ID` INTEGER NOT NULL,
+ `AuthorID` INTEGER NOT NULL,
+ `Date` DATE NOT NULL,
+ `Writings` VARCHAR(35) NOT NULL,
+ CONSTRAINT `Diary_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `RouteDiary` ADD CONSTRAINT `JourneyParticipant_RouteDiary` 
+ FOREIGN KEY (`AuthorID`) REFERENCES `JourneyParticipants` (`ID`); 
+
+CREATE TABLE `Requirements` (
+ `ID` INTEGER NOT NULL,
+ `JourneyID` INTEGER NOT NULL,
+ `SkillID` INTEGER NOT NULL,
+ CONSTRAINT `Requirements_PK` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `Requirements` ADD CONSTRAINT `Journey_Requirement` 
+ FOREIGN KEY (`JourneyID`) REFERENCES `Journeys` (`ID`);
+ALTER TABLE `Requirements` ADD CONSTRAINT `Skills_Requirement` 
+ FOREIGN KEY (`SkillID`) REFERENCES `Skills` (`ID`);
+
+CREATE TABLE `RoutePlan` (
+ `ID` INTEGER NOT NULL,
+ `JourneyID` INTEGER NOT NULL,
+ `RouteDate` DATE NOT NULL,
+ `Place` VARCHAR(35) NOT NULL,
+ `Details` VARCHAR(35),
+ CONSTRAINT `RoutePlan_KEY` PRIMARY KEY (`ID`)
+);
+ALTER TABLE `RoutePlan` ADD CONSTRAINT `Journeys_RoutePlan` 
+ FOREIGN KEY (`JourneyID`) REFERENCES `Journeys` (`ID`);

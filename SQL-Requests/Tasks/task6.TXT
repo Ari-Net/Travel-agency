@@ -1,0 +1,20 @@
+DELIMITER //
+Create procedure Task6(
+ IN Slr DECIMAL,
+ IN BirthD DATE,
+ IN Ag INT,
+ IN DtFrom DATE
+)
+BEGIN
+ Select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname
+ from tourists Trs
+ inner join SectionBoss SB on SB.TouristID=Trs.ID
+ where 1=1
+and (Trs.Birthday = BirthD or BirthD is null)
+and (Year(curdate()) - Year(Trs.Birthday) = Ag or Ag is null)
+and (SB.Salary = Slr or Slr is null)
+ and (SB.StartDate = DtFrom or DtFrom is null);
+END//

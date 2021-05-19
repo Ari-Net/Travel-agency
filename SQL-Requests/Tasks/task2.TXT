@@ -1,0 +1,27 @@
+DELIMITER //
+CREATE PROCEDURE Task2
+(
+ IN Sct INT,
+ IN Skl INT,
+ IN Ag INT,
+ IN Slr DECIMAL, 
+ IN Gnd VARCHAR(35)
+)
+BEGIN
+select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname
+from Tourists Trs
+inner join GroupsLeaders GL on GL.TouristID=Trs.ID
+ inner join SectionGroups SG on SG.ID=GL.GroupID
+where 1=1
+and (SG.SID=Sct or Sct is null) 
+ and (Year(curdate())-Year(Trs.Birthday)=Ag or Ag is null)
+ and (Trs.Gender=Gnd or Gnd is null) 
+and (exists(Select * from TouristSkills TS
+where TS.TouristID=Trs.ID
+ and TS.SkillID=Skl)
+ or Skl is null)
+and (((Select Sum(Salary) from GroupsLeaders GLL where GLL.TouristID=Trs.ID)=Slr) or Slr is null);
+END//

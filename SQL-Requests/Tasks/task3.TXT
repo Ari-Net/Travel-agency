@@ -1,0 +1,16 @@
+DELIMITER //
+CREATE PROCEDURE Task3(
+IN Sct INT
+)
+BEGIN
+ select distinct
+ Cmp.NameC,
+ Cmp.DateC,
+ Cmp.Details
+ from Competitions Cmp
+ inner join competitionparticipants CP on CP.CompetitionID = Cmp.ID
+ inner join groupparticipant GP on GP.ID = CP.ParticipantID
+ inner join SectionGroups SG on SG.ID = GP.GroupID
+where 1=1
+ and (SG.SID = Sct or Sct is null);
+END// 

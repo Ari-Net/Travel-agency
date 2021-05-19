@@ -1,0 +1,23 @@
+DELIMITER //
+CREATE PROCEDURE Task12(
+ IN Sct INT,
+ IN Grp INT
+)
+BEGIN
+ Select
+ Trs.Name,
+ Trs.SecondName,
+ Trs.Surname
+ from tourists Trs
+ inner join GroupParticipant GP on GP.TouristID = Trs.ID
+ inner join SectionGroups SG on SG.ID = GP.GroupID
+ where 1=1
+ and (SG.SID = Sct or Sct is null)
+ and (SG.ID = Grp or Grp is null)
+ and exists (select 1 from GroupsLeaders GL
+ where GL.GroupID = SG.ID
+ and exists (select 1 from journeys T
+ inner join journeyparticipants TP on TP.JourneyID = T.ID
+ where T.LeaderID = GL.TouristID
+ and TP.TouristID = Trs.ID));
+END//
